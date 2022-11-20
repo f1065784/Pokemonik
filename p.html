@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+<header id="header">
+<a href="y.html">Основа</a>
+<a href="k.html">Пагинацыя</a>
+<a href="p.html">Сортирование</a>
+<a href="ft.html">Фильтрацыя</a>
+</header>
+<h1>Сортируем покемонов с первой локации(первые 127)</h1>
+<form>
+	<h2>Сортируем по:</h2>
+	<div>
+	<label for="id">id: </label>
+	<input type="radio" id="id" name="sort" value="id" checked>
+	<label for="hp">hp: </label>
+	<input type="radio" id="hp" name="sort" value="hp" >
+	<label for="attack">attack: </label>
+	<input type="radio" id="attack" name="sort" value="attack" >
+	<label for="defence">defence: </label>
+	<input type="radio" id="defence" name="sort" value="defence">
+	<label for="speed">speed: </label>
+	<input type="radio" id="speed" name="sort" value="speed">
+</div>
+<h2>Очередь:</h2>
+<div>
+	<label for="downToUp">Down To Up </label>
+	<input type="radio" id="downToUp" name="order" value="downToUp" checked>
+	<label for="upToDown">Up To Down </label>
+	<input type="radio" id="upToDown" name="order" value="upToDown" >
+</div>
+</form>
+<main>
+	
+</main>
+<style>
+	h1,form,#pokemon{
+		background-color: #B22222;
+		text-align: center;
+		width: 50%;
+		padding: 10px;
+		border: 3px solid black;
+		border-radius: 10%;
+	}
+	h2{
+		margin: 10px;
+	}
+	form{
+		padding: 20px 0 40px 0;
+	}
+	body{
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+	main{
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: center;
+	}
+	#pokemon{
+		width: auto;
+		background-color: #B22222;
+		margin: 10px;
+		padding: 20px;
+	}
+	.stats{
+		display: flex;
+		justify-content: space-around;
+	}
+	.hp{
+		color: red;
+	}
+	.attack{
+		color: green;
+	}
+	.defence{
+		color: blue;
+	}
+	.speed{
+		color: yellow;
+	}
+	.stat{
+		margin: 0 10px;
+	}
+	input[type=radio]{
+		margin: 0 20px 0 0;
+	}
+	a{
+		color: white;
+		text-decoration: none;
+		padding: 5px;
+	}
+	#header{
+		border-radius: 30px;
+		border: red;
+		background-color: blue;
+		width: 45%;
+		cursor: row-resize;
+		align-items: center;
+		justify-content: center;
+		gap: 10rem;
+		
+		
+	}
+</style>
+<script>
+	let allPokemons = [];
+	const url = "https://pokeapi.co/api/v2/pokemon?limit=127";
+	const main = document.querySelector("main");
+	const form = document.querySelector("form");
+	let order = true;
+	let object = "id";
+	const request = new XMLHttpRequest();
+	request.open("GET", url);
+	request.send();
+	request.onload = function(){
+	const pokemons = JSON.parse(request.response).results;
+	pokemons.forEach(pokemon=>{
+	let promise = new Promise(function(resolve,reject){
+	let pokemonRequest = new XMLHttpRequest();
+	pokemonRequest.open("GET", pokemon.url);
+	pokemonRequest.send();
+	pokemonRequest.onload = function(){
+	if (pokemonRequest.status === 200) {
+	resolve(JSON.parse(pokemonRequest.response));	
+	}
+	else{
+	reject(pokemonRequest.statusText);
+	}
+    }
+	pokemonRequest.onerror = function(){
+	reject(pokemonRequest.statusText);
+	}
+	});
+	promise.then((pokemon)=>{
+	allPokemons.push(pokemon);
+	drawPokemon(pokemon);
+	});
+	});
+    }
+	function drawPokemon(pokemon){
+	console.log(pokemon);
+	main.innerHTML += `
+	<div id = "pokemon">
+	<p>Pokemon №${pokemon.id}</p>
+	<h3>${pokemon.name}</h3>
+	<img src = "${pokemon.sprites.front_default}" alt = "">
+	<div class = "stats">
+	<p class = "hp stat">&#10084;${pokemon.stats[0].base_stat}</p>
+	<p class = "attack stat">&#9876;${pokemon.stats[1].base_stat}</p>
+	<p class = "defence stat">&#128737;${pokemon.stats[2].base_stat}</p>
+	<p class = "speed stat">&#128007;${pokemon.stats[5].base_stat}</p>
+	</div>
+	</div>
+	 `;
+	}
+	form.addEventListener("change",(event)=>{
+	let value = event.target.value;
+	switch(value){
+		case "id":
+		object = "id";
+		break;
+		case "hp":
+		object = "hp";
+		break;
+		case "attack":
+		object = "attack";
+		break;
+		case "defence":
+		object = "defence";
+		break;
+		case "speed":
+		object = "speed";
+		break;
+		case "downToUp":
+		order = true;
+		break;
+		case "upToDown":
+		order = false;
+		break;
+	}
+	sort();
+	})
+	function sort(){
+	main.innerHTML = null;
+	switch(object){
+	case "id":
+	allPokemons = allPokemons.sort(function(first, second){
+		if (first.id > second.id) {
+			return order;
+		}
+		if (first.id < second.id) {
+			return -order;
+		}
+	});
+	break;
+	case "hp":
+	allPokemons = allPokemons.sort(function(first, second){
+		if (first.stats[0].base_stat > second.stats[0].base_stat) {
+			return order;
+		}
+		if (first.stats[0].base_stat < second.stats[0].base_stat) {
+			return -order;
+		}
+	});
+	break;
+	case "attack":
+	allPokemons = allPokemons.sort(function(first, second){
+		if (first.stats[1].base_stat > second.stats[1].base_stat) {
+			return order;
+		}
+		if (first.stats[1].base_stat < second.stats[1].base_stat) {
+			return -order;
+		}
+	});
+	break;
+	case "defence":
+	allPokemons = allPokemons.sort(function(first, second){
+		if (first.stats[2].base_stat > second.stats[2].base_stat) {
+			return order;
+		}
+		if (first.stats[2].base_stat < second.stats[2].base_stat) {
+			return -order;
+		}
+	});
+	break;
+	case "speed":
+	allPokemons = allPokemons.sort(function(first, second){
+		if (first.stats[5].base_stat > second.stats[5].base_stat) {
+			return order;
+		}
+		if (first.stats[5].base_stat < second.stats[5].base_stat) {
+			return -order;
+		}
+	});
+	break;
+		}
+		if (!order) {
+			allPokemons.reverse();
+		}
+		allPokemons.forEach((pokemon)=>{
+			drawPokemon(pokemon);
+		});
+	}
+</script>
+</body>
+</html>

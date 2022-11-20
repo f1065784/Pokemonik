@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<body>
+<header>
+<a href="y.html">Основа</a>
+<a href="k.html">Пагинацыя</a>
+<a href="p.html">Сортирование</a>
+<a href="ft.html">Фильтрацыя</a>
+</header>
+<h1>Фильтрацыя покемонов с первой локации(первые 127)</h1>
+<form>
+    <h2>Фільтрувати за:</h2>
+    <label for="name">
+        Name:
+        <input type="text" id="name" placeholder="Покемон">
+    </label>
+    <div id="rangesAndTexts">
+        <label for="minHp">
+            Здоровье от:
+            <input type="range" id="minHp" min="10" max="250" value="10">
+        </label>
+        <label for="maxHp">
+            Здоровье до:
+            <input type="range" id="maxHp" min="10" max="250" value="250">
+        </label>
+        <label for="minAttack">
+            Атака от:
+            <input type="range" id="minAttack" min="5" max="130" value="5">
+        </label>
+        <label for="maxAttack">
+            Атака до:
+            <input type="range" id="maxAttack" min="5" max="130" value="130">
+        </label>
+        <label for="minDefense">
+            Защита от:
+            <input type="range" id="minDefense" min="5" max="180" value="5">
+        </label>
+        <label for="maxDefense">
+            Защита до:
+            <input type="range" id="maxDefense" min="5" max="180" value="180">
+        </label>
+        <label for="minSpeed">
+            Скорость от:
+            <input type="range" id="minSpeed" min="15" max="150" value="15">
+        </label>
+        <label for="maxSpeed">
+            Скорость до:
+            <input type="range" id="maxSpeed" min="15" max="150" value="150">
+        </label>
+        <label for="minHeight">
+            Минимальная высота:
+            <input type="text" id="minHeight" placeholder="Мінімальна висота" value="2">
+        </label>
+        <label for="maxHeight">
+            Максимальная высота:
+            <input type="text" id="maxHeight" placeholder="Максимальна висота" value="88">
+        </label>
+        <label for="minWeight">
+            Минимальный вес:
+            <input type="text" id="minWeight" placeholder="Мінімальна вага" value="1">
+        </label>
+        <label for="maxWeight">
+            Максимальный вес:
+            <input type="text" id="maxWeight" placeholder="Максимальна вага" value="3000">
+        </label>
+    </div>
+    <div id="checkBoxes">
+        <label for="normal">
+            Нормальные:
+            <input type="checkbox" id="normal" name="type" value="normal" checked>
+        </label>
+        <label for="fighting">
+            Бойцы:
+            <input type="checkbox" id="fighting" name="type" value="fighting" checked>
+        </label>
+        <label for="flying">
+            Литающие:
+            <input type="checkbox" id="flying" name="type" value="flying" checked>
+        </label>
+        <label for="poison">
+            Отравленные:
+            <input type="checkbox" id="poison" name="type" value="poison" checked>
+        </label>
+        <label for="ground">
+            Земляные:
+            <input type="checkbox" id="ground" name="type" value="ground" checked>
+        </label>
+        <label for="rock">
+           Каменные:
+            <input type="checkbox" id="rock" name="type" value="rock" checked>
+        </label>
+        <label for="bug">
+            Жуки:
+            <input type="checkbox" id="bug" name="type" value="bug" checked>
+        </label>
+        <label for="ghost">
+            Преведения:
+            <input type="checkbox" id="ghost" name="type" value="ghost" checked>
+        </label>
+        <label for="steel">
+            Стальные:
+            <input type="checkbox" id="steel" name="type" value="steel" checked>
+        </label>
+        <label for="fire">
+            Горящие:
+            <input type="checkbox" id="fire" name="type" value="fire" checked>
+        </label>
+        <label for="water">
+            Водные:
+            <input type="checkbox" id="water" name="type" value="water" checked>
+        </label>
+        <label for="grass">
+            Травяные:
+            <input type="checkbox" id="grass" name="type" value="grass" checked>
+        </label>
+        <label for="electric">
+            Электрические:
+            <input type="checkbox" id="electric" name="type" value="electric" checked>
+        </label>
+        <label for="psychic">
+            Духовые:
+            <input type="checkbox" id="psychic" name="type" value="psychic" checked>
+        </label>
+        <label for="ice">
+            Ледяные:
+            <input type="checkbox" id="ice" name="type" value="ice" checked>
+        </label>
+        <label for="dragon">
+            Драконы:
+            <input type="checkbox" id="dragon" name="type" value="dragon" checked>
+        </label>
+        <label for="dark">
+            Темные:
+            <input type="checkbox" id="dark" name="type" value="dark" checked>
+        </label>
+        <label for="fairy">
+            Феи:
+            <input type="checkbox" id="fairy" name="type" value="fairy" checked>
+        </label>
+        <label for="unknown">
+            Неизвестные:
+            <input type="checkbox" id="unknown" name="type" value="unknown" checked>
+        </label>
+        <label for="shadow">
+            Теневые:
+            <input type="checkbox" id="shadow" name="type" value="shadow" checked>
+        </label>
+    </div>
+    <input type="submit" value="Применить фильтры">
+</form>
+<main>
+
+</main>
+<script>
+	let allPokemons = [];
+let sortedPokemons = [];
+const url = "https://pokeapi.co/api/v2/pokemon?limit=127";
+const main = document.querySelector("main");
+const form = document.querySelector("form");
+const request = new XMLHttpRequest();
+request.open("GET", url);
+request.send();
+request.onload = function () {
+    const pokemons = JSON.parse(request.response).results;
+    pokemons.forEach(pokemon => {
+        let promise = new Promise(function (resolve, reject) {
+            let pokemonRequest = new XMLHttpRequest();
+            pokemonRequest.open("GET", pokemon.url);
+            pokemonRequest.send();
+            pokemonRequest.onload = function () {
+                if (pokemonRequest.status === 200) {
+                    resolve(JSON.parse(pokemonRequest.response));
+                } else {
+                    reject(pokemonRequest.statusText)
+                }
+            }
+            pokemonRequest.onerror = function () {
+                reject(pokemonRequest.statusText);
+            }
+        });
+        promise.then((pokemon) => {
+            allPokemons.push(pokemon);
+            drawPokemon(pokemon);
+        });
+    });
+}
+
+function drawPokemon(pokemon) {
+    let getTypes = "";
+    pokemon.types.forEach(type => {
+        getTypes += `
+        <h4>${type.type.name}</h4>
+        `
+    })
+    main.innerHTML += `
+        <div id="pokemon">
+            <p>Pokemon № ${pokemon.id}</p>
+            <h3>${pokemon.name}</h3>
+            <img src="${pokemon.sprites.front_default}" alt="">
+            <div class="stats">
+                <p class="hp stat">&#10084;${pokemon.stats[0].base_stat}</p>
+                <p class="attack stat">&#9876;${pokemon.stats[1].base_stat}</p>
+                <p class="defense stat">&#128737;${pokemon.stats[2].base_stat}</p>
+                <p class="speed stat">&#140607;${pokemon.stats[5].base_stat}</p>
+            </div>
+            <div class="heightAndWeight">
+                <p>Высота: ${pokemon.height}</p>
+                <p>Вес: ${pokemon.weight}</p>
+            </div>
+            <div class="types">
+                ${getTypes}
+            </div>
+        </div>
+    `;
+}
+form.addEventListener("submit",(event)=>{
+    event.preventDefault();
+    sortedPokemons = allPokemons;
+    //name
+    if(event.target.name.value){
+        sortedPokemons = sortedPokemons.filter(function (pokemon){
+            return pokemon.name.indexOf(event.target.name.value.toLowerCase()) !== -1;
+        });
+    }
+    //hp
+    if(event.target.minHp.value > 10){
+        sortedPokemons = sortedPokemons.filter(function (pokemon){
+            return pokemon.stats[0].base_stat >= event.target.minHp.value;
+        });
+    }
+    if(event.target.maxHp.value < 250){
+        sortedPokemons = sortedPokemons.filter(function (pokemon){
+            return pokemon.stats[0].base_stat <= event.target.maxHp.value;
+        });
+    }
+    //attack
+    if(event.target.minAttack.value > 5){
+        sortedPokemons = sortedPokemons.filter(function (pokemon){
+            return pokemon.stats[1].base_stat >= event.target.minAttack.value;
+        });
+    }
+    if(event.target.maxAttack.value < 130){
+        sortedPokemons = sortedPokemons.filter(function (pokemon){
+            return pokemon.stats[1].base_stat <= event.target.maxAttack.value;
+        });
+    }
+    //defense
+    if(event.target.minDefense.value > 5){
+        sortedPokemons = sortedPokemons.filter(function (pokemon){
+            return pokemon.stats[2].base_stat >= event.target.minDefense.value;
+        });
+    }
+    if(event.target.maxDefense.value < 180){
+        sortedPokemons = sortedPokemons.filter(function (pokemon){
+            return pokemon.stats[2].base_stat <= event.target.maxDefense.value;
+        });
+    }
+    //speed
+    if(event.target.minSpeed.value > 15){
+        sortedPokemons = sortedPokemons.filter(function (pokemon){
+            return pokemon.stats[5].base_stat >= event.target.minSpeed.value;
+        });
+    }
+    if(event.target.maxSpeed.value < 150){
+        sortedPokemons = sortedPokemons.filter(function (pokemon){
+            return pokemon.stats[5].base_stat <= event.target.maxSpeed.value;
+        });
+    }
+    //height
+    if(event.target.minHeight.value > 1){
+        sortedPokemons = sortedPokemons.filter(function (pokemon){
+            return pokemon.height >= event.target.minHeight.value;
+        });
+    }
+    if(event.target.maxHeight.value < 89){
+        sortedPokemons = sortedPokemons.filter(function (pokemon){
+            return pokemon.height<= event.target.maxHeight.value;
+        });
+    }
+    //weight
+    if(event.target.minWeight.value > 0){
+        sortedPokemons = sortedPokemons.filter(function (pokemon){
+            return pokemon.weight >= event.target.minWeight.value;
+        });
+    }
+    if(event.target.maxWeight.value < 3001){
+        sortedPokemons = sortedPokemons.filter(function (pokemon){
+            return pokemon.weight<= event.target.maxWeight.value;
+        });
+    }
+    // type
+    event.target.type.forEach(function (filterType){
+        console.log(filterType);
+        console.log(filterType.value);
+        if(!filterType.checked){
+            sortedPokemons = sortedPokemons.filter(function (pokemon){
+                for(i in pokemon.types){
+                    if(pokemon.types[i].type.name === filterType.value) {
+                        return false;
+                    }
+                }
+                return true;
+            })
+        }
+    })
+    main.innerHTML = null;
+    sortedPokemons.forEach((pokemon)=>{
+        drawPokemon(pokemon);
+    })
+})
+
+
+</script>
+<style>
+	header{
+		background: rgb(255,0,3);
+		background: linear-gradient(0deg, rgba(255,0,3,1) 0%, rgba(249,255,0,1) 100%);
+		width: 40rem;
+		height: 4rem;
+		border-radius: 50%;
+		display: flex;
+		justify-content: space-between;
+		padding-top: 2rem;
+	}
+	a{
+		color: black;
+		text-decoration: none;
+	}
+	h1, form{
+    margin: 10px;
+    background: rgb(249,255,0);
+	background: linear-gradient(0deg, rgba(249,255,0,1) 0%, rgba(255,0,3,1) 100%);
+    text-align: center;
+    width: 50%;
+    padding: 10px;
+    border: 3px solid black;
+    border-radius: 30px;
+}
+body{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+main{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+}
+#rangesAndTexts{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 10px;
+}
+#checkBoxes{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-gap: 10px;
+}
+#pokemon{
+    width: auto;
+    background: rgb(249,255,0);
+	background: linear-gradient(0deg, rgba(249,255,0,1) 0%, rgba(255,0,3,1) 100%);
+    margin: 10px;
+    padding: 20px;
+    text-align: center;
+    border: 3px solid black;
+    border-radius: 30px;
+}
+.stats{
+    display: flex;
+    justify-content: space-around;
+}
+.hp{
+    color: red;
+}
+.attack{
+    color: green;
+}
+.defense{
+    color: blue;
+}
+.speed{
+    color: yellow;
+}
+.stat{
+    margin: 0 10px;
+}
+.heightAndWeight, .types{
+    display: flex;
+    justify-content: space-around;
+}
+</style>
+</body>
+</html><!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+
+</body>
+</html>
